@@ -10,12 +10,12 @@ function App() {
         <section id="form">
           <div>
             <Label htmlFor="weight">Peso (kg)</Label>
-            <Input type="text" id="weight" />
+            <Input type="text" id="weight" className="mt-1" />
           </div>
 
           <div className="mt-4">
             <Label htmlFor="height">Altura (cm)</Label>
-            <Input type="text" id="height" />
+            <Input type="text" id="height" className="mt-1" />
           </div>
 
           <Button type="submit">Calcular</Button>
