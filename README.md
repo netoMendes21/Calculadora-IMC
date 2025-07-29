@@ -25,4 +25,6 @@
 <img src="./src/public/pg-codante.png" width="300px">
 <br> <br>
 
-## Link para acessar plataforma <a href="https://codante.io/mini-projetos/calculadora-de-imc-com-react" target="_blank">aqui</a> .
+## Links:
+<p>Projeto: <a href="https://projeto-calculadora-eelmfe35p-netomendes21s-projects.vercel.app">Caculador-IMC</a></p>
+<p>Plataforma Codante: <a href="https://codante.io/mini-projetos/calculadora-de-imc-com-react" target="_blank">Codante</a></p>
