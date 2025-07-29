@@ -7,8 +7,11 @@
 <br>
 
 #### Mobile
+<div>
 <img src="./src/public/calculadora-IMC-mobile.png" width="300px">
 <img src="./src/public/calculadora-IMC-result.png" width="300px">
+</div>
+
 
 ## 🛠️ Tecnologias
 
