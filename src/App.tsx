@@ -1,118 +1,175 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./components/Button";
-import Input from "./components/Input";
+import MeasurementInput from "./components/MeasurementInput";
+import Icon from "./components/Icon";
 import Label from "./components/Label";
 import ReferenceTable from "./components/ReferenceTable";
-import calculateIMC, { IMCResult } from "./lib/IMC";
 import ResultsTable from "./components/ResultsTable";
-import { validateHeight, validateWeight } from "./lib/validators";
+import calculateIMC, { IMCResult, type Calculation } from "./lib/IMC";
+import { parseMeasurement } from "./lib/validators";
+import type { MeasurementField } from "./lib/inputMask";
+
+const measurementFields = [
+  {
+    name: "weight",
+    label: "Seu peso",
+    unit: "kg",
+    hint: "Digite 755 → 75,5 kg. Vírgula automática.",
+  },
+  {
+    name: "height",
+    label: "Sua altura",
+    unit: "m",
+    hint: "Digite 175 → 1,75 m. Vírgula automática.",
+  },
+] as const;
 
 function App() {
-  const [IMCData, setIMCData] = useState<null | {
-    weight: number;
-    height: number;
-    IMC: number;
-    category: string;
-  }>(null);
+  const [values, setValues] = useState({ weight: "", height: "" });
+  const [errors, setErrors] = useState<
+    Partial<Record<MeasurementField, string>>
+  >({});
+  const [result, setResult] = useState<Calculation | null>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const resultRef = useRef<HTMLElement>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    const formData = new FormData(e.currentTarget);
-    const data = Object.fromEntries(formData) as {
-      weight: string;
-      height: string;
-    };
+  useEffect(() => {
+    if (result) resultRef.current?.focus();
+  }, [result]);
 
-    const { weight, height } = data;
-    if (!weight || !height) {
-      alert("Ops...você precisa preencher os campos");
-      return;
-    }
-
-    const weightNumber = parseFloat(weight.replace(",", "."));
-    const heightNumber = parseFloat(height.replace(",", ".")) / 100;
-
-    const validatorWeight = validateWeight(weightNumber);
-    if (validatorWeight) {
-      alert(validatorWeight);
-      return;
-    }
-
-    const validatorHeight = validateHeight(heightNumber);
-    if (validatorHeight) {
-      alert(validatorHeight);
-      return;
-    }
-
-    const IMC = calculateIMC(weightNumber, heightNumber);
-
-    const IMCResultString = IMCResult(IMC);
-
-    setIMCData({
-      weight: weightNumber,
-      height: heightNumber,
-      IMC: IMC,
-      category: IMCResultString,
-    });
-
-    e.currentTarget.reset();
+  function focusField(field: MeasurementField) {
+    formRef.current?.querySelector<HTMLInputElement>(`#${field}`)?.focus();
   }
 
-  function handleClickReset(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-    setIMCData(null);
+  function setFieldError(field: MeasurementField, error?: string) {
+    setErrors((previous) => ({ ...previous, [field]: error }));
+  }
+
+  function changeField(field: MeasurementField, value: string) {
+    setValues((previous) => ({ ...previous, [field]: value }));
+    setFieldError(field);
+  }
+
+  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const weight = parseMeasurement(values.weight, "weight");
+    const height = parseMeasurement(values.height, "height");
+    setErrors({
+      weight: weight.error ?? undefined,
+      height: height.error ?? undefined,
+    });
+    if (weight.value === null || height.value === null) {
+      setResult(null);
+      focusField(weight.error ? "weight" : "height");
+      return;
+    }
+    const IMC = calculateIMC(weight.value, height.value);
+    setResult({
+      weight: weight.value,
+      height: height.value,
+      IMC,
+      category: IMCResult(IMC),
+    });
+  }
+
+  function reset() {
+    setValues({ weight: "", height: "" });
+    setErrors({});
+    setResult(null);
+    focusField("weight");
   }
 
   return (
-    <main className="bg-white max-w-4xl mx-auto md:py-24 md:px-48 px-5 py-10">
-      <form onSubmit={handleSubmit}>
-        <section id="form">
-          <div>
-            <Label htmlFor="weight">Peso (kg)</Label>
-            <Input
-              disabled={!!IMCData}
-              name="weight"
-              type="text"
-              id="weight"
-              className="mt-1"
-            />
-          </div>
-
-          <div className="mt-4">
-            <Label htmlFor="height">Altura (cm)</Label>
-            <Input
-              disabled={!!IMCData}
-              name="height"
-              type="text"
-              id="height"
-              className="mt-1"
-            />
-          </div>
-
-          {IMCData ? (
-            <Button onClick={handleClickReset} type="button">
-              Refazer
-            </Button>
-          ) : (
-            <Button type="submit">Calcular</Button>
-          )}
+    <div className={`app-shell ${result ? "showing-result" : "initial-view"}`}>
+      <header className="site-header">
+        <a className="brand" href="#main">
+          <span className="brand-mark" aria-hidden="true">
+            <Icon name="heart" />
+          </span>
+          equilíbrio<span className="brand-period">.</span>
+        </a>
+      </header>
+      <main id="main">
+        <section className="intro">
+          <h1>
+            Seu corpo, além <br />
+            de um <span>número.</span>
+          </h1>
+          <p>Calcule seu IMC e conheça a faixa de peso para sua altura.</p>
         </section>
-
-        <section id="result" className="py-10 px-4 h-40">
-          {IMCData ? (
-            <ResultsTable IMCData={IMCData} />
-          ) : (
-            <p className="text-center text-neutral-400">
-              Saiba agora se está no seu peso ideal!
+        <div className="calculator-grid">
+          <section
+            className="calculator card"
+            aria-labelledby="calculator-title"
+          >
+            <div className="step-label">
+              <span>01</span> SEUS DADOS
+            </div>
+            <h2 id="calculator-title">Vamos calcular seu IMC?</h2>
+            <p className="section-description">
+              Preencha seu peso e sua altura para começar.
             </p>
-          )}
-        </section>
-
-        <section id="reference-table">
-          <ReferenceTable />
-        </section>
-      </form>
-    </main>
+            <form ref={formRef} onSubmit={handleSubmit} noValidate>
+              <div className="measurement-fields">
+                {measurementFields.map(({ name: field, label, unit, hint }) => (
+                  <div className="field" key={field}>
+                    <Label htmlFor={field}>{label}</Label>
+                    <div
+                      className={`input-wrap ${errors[field] ? "invalid" : ""}`}
+                    >
+                      <MeasurementInput
+                        field={field}
+                        value={values[field]}
+                        error={errors[field]}
+                        onError={(message) => setFieldError(field, message)}
+                        onChange={(value) => changeField(field, value)}
+                      />
+                      <span className="input-unit" aria-hidden="true">
+                        {unit}
+                      </span>
+                    </div>
+                    <p id={`${field}-hint`} className="sr-only">
+                      {hint}
+                    </p>
+                    {errors[field] && (
+                      <p
+                        className="field-error"
+                        id={`${field}-error`}
+                        role="alert"
+                      >
+                        {errors[field]}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+              <Button type="submit">
+                Calcular meu IMC <Icon name="arrow" />
+              </Button>
+              {result && (
+                <button className="reset-button" type="button" onClick={reset}>
+                  <Icon name="reset" /> Refazer cálculo
+                </button>
+              )}
+            </form>
+          </section>
+          <section
+            className="result-panel"
+            ref={resultRef}
+            tabIndex={-1}
+            aria-label="Resultado do cálculo"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {result && <ResultsTable IMCData={result} />}
+          </section>
+        </div>
+        {result && <ReferenceTable imc={result.IMC} />}
+      </main>
+      <footer>
+        <span className="footer-brand">equilíbrio.</span>
+      </footer>
+    </div>
   );
 }
 

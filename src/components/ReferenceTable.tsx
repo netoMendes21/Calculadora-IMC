@@ -1,42 +1,80 @@
-export default function ReferenceTable() {
+import { categories, classifyIMC, getPresentationTone } from "../lib/IMC";
+import BMIAvatar from "./BMIAvatar";
+
+export default function ReferenceTable({ imc }: { imc: number }) {
+  const category = classifyIMC(imc).label;
+  const tone = getPresentationTone(imc);
   return (
-    <table className="mx-auto text-neutral-600 text-left md:text-base text-xs">
-      <thead className="bg-zinc-100 text-rose-400 text-xl">
-        <tr>
-          <th className="px-6 py-2">IMC</th>
-          <th className="px-6 py-2">Classificação</th>
-        </tr>
-      </thead>
-      <tbody className="[&>tr:nth-child(even)]:bg-zinc-100 [&>tr:nth-child(odd)]:bg-white [&>tr>td]:px-6 [&>tr>td]:py-1">
-        <tr>
-          <td>menos de 17</td>
-          <td>Muito abaixo do peso</td>
-        </tr>
-        <tr>
-          <td>Menor que 18,5</td>
-          <td>Abaixo do peso</td>
-        </tr>
-        <tr>
-          <td>Entre 18,5 a 24,9</td>
-          <td>Peso normal</td>
-        </tr>
-        <tr>
-          <td>25 a 29,9</td>
-          <td>Sobrepeso</td>
-        </tr>
-        <tr>
-          <td>30 a 34,9</td>
-          <td>Obesidade grau I</td>
-        </tr>
-        <tr>
-          <td>35 a 39,9</td>
-          <td>Obesidade grau II</td>
-        </tr>
-        <tr>
-          <td>Maior que 40</td>
-          <td>Obesidade grau III</td>
-        </tr>
-      </tbody>
-    </table>
+    <section className="reference card" aria-labelledby="reference-title">
+      <div className="section-heading">
+        <span className="eyebrow">ENTENDA SEU RESULTADO</span>
+        <h2 id="reference-title">Classificação do IMC para adultos</h2>
+      </div>
+      <table>
+        <caption className="sr-only">
+          Tabela de faixas de IMC para adultos.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Valor do IMC</th>
+            <th scope="col">
+              <span className="classification-heading">
+                <span aria-hidden="true" />
+                <span>O que indica</span>
+              </span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {categories.map((item) => {
+            const selected = category === item.label;
+            return (
+              <tr
+                key={item.label}
+                className={selected ? `selected ${tone}` : undefined}
+                aria-current={selected ? "true" : undefined}
+              >
+                <td>{item.range}</td>
+                <td>
+                  <span className="classification-label">
+                    <BMIAvatar category={item.label} />
+                    <span className="classification-text">
+                      {selected && (
+                        <span
+                          className="current-indicator"
+                          aria-hidden="true"
+                        />
+                      )}
+                      {item.label}
+                      {selected && (
+                        <span className="sr-only"> — sua faixa atual</span>
+                      )}
+                    </span>
+                  </span>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+      <p className="source">
+        Fonte:{" "}
+        <a
+          href="https://www.who.int/data/nutrition/nlis/info/malnutrition-in-women"
+          target="_blank"
+          rel="noreferrer"
+        >
+          OMS ↗
+        </a>
+        .{" "}
+        <a
+          href="https://www.cdc.gov/bmi/adult-calculator/bmi-categories.html"
+          target="_blank"
+          rel="noreferrer"
+        >
+          CDC ↗
+        </a>
+      </p>
+    </section>
   );
 }
