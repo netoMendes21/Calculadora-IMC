@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Prévia da Calculadora de IMC</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { margin: 0; width: 1320px; height: 644px; overflow: hidden; background: transparent; }
+      .devices { position: relative; width: 100%; height: 100%; }
+      .laptop { position: absolute; left: 0; bottom: 0; width: 1024px; }
+      .laptop-display { position: relative; width: 984px; padding: 12px; margin: auto; border-radius: 18px 18px 3px 3px; background: linear-gradient(135deg, #55565b, #222327); }
+      .camera { position: absolute; top: 4px; left: calc(50% - 2px); width: 4px; height: 4px; border-radius: 50%; background: #141518; }
+      .screen { position: relative; overflow: hidden; background: #fff8f6; }
+      .laptop .screen { width: 960px; height: 600px; border-radius: 7px; }
+      iframe { display: block; border: 0; transform-origin: top left; }
+      .laptop iframe { width: 1280px; height: 800px; transform: scale(.75); }
+      .laptop-base { position: relative; height: 20px; background: linear-gradient(#d6d7dc, #a4a6ad); border-radius: 1px 1px 50% 50% / 1px 1px 16px 16px; }
+      .laptop-base::before { content: ""; position: absolute; top: 0; left: 43%; width: 14%; height: 6px; border-radius: 0 0 6px 6px; background: #85878e; }
+      .phone { position: absolute; right: 2px; bottom: 0; padding: 20px 10px 11px; border: 3px solid #747981; border-radius: 43px; background: #101114; box-shadow: inset 0 0 0 1px #a0a4ad; }
+      .phone .screen { width: 246px; height: 533px; border-radius: 31px; }
+      .phone iframe { width: 375px; height: 812px; transform: scale(.656); }
+      .phone::before { content: ""; position: absolute; z-index: 2; top: 20px; left: 50%; width: 72px; height: 17px; transform: translateX(-50%); border-radius: 9px; background: #101114; }
+      .phone::after { content: ""; position: absolute; z-index: 3; top: 24px; left: calc(50% + 18px); width: 8px; height: 8px; border-radius: 50%; background: radial-gradient(circle, #263d59, #020408 70%, #343940); }
+      .speaker { position: absolute; top: 8px; left: calc(50% - 29px); width: 58px; height: 3px; border-radius: 2px; background: #35383e; }
+      .phone-buttons { position: absolute; top: 137px; left: -6px; width: 4px; height: 51px; border-radius: 2px; background: #969ba3; box-shadow: 0 65px #969ba3; }
+      .phone-power { position: absolute; top: 150px; right: -5px; width: 4px; height: 75px; border-radius: 2px; background: #969ba3; }
+      .home-indicator { position: absolute; bottom: 16px; left: calc(50% - 39px); width: 78px; height: 3.5px; border-radius: 2px; background: #292b30; }
+    </style>
+  </head>
+  <body>
+    <main class="devices" aria-label="Calculadora de IMC em notebook e celular">
+      <div class="laptop">
+        <div class="laptop-display"><span class="camera" aria-hidden="true"></span><div class="screen"><iframe id="notebook" src="/" title="Calculadora no notebook"></iframe></div></div>
+        <div class="laptop-base"></div>
+      </div>
+      <div class="phone"><span class="speaker" aria-hidden="true"></span><span class="phone-buttons" aria-hidden="true"></span><span class="phone-power" aria-hidden="true"></span><div class="screen"><iframe id="phone" src="/" title="Calculadora no celular"></iframe></div><span class="home-indicator" aria-hidden="true"></span></div>
+    </main>
+  </body>
+</html>
