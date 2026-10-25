@@ -6,8 +6,8 @@ Uma calculadora de Índice de Massa Corporal com interface simples e responsiva.
 
 ## Links
 
-- Acessar o projeto: [(https://projeto-calculadora-imc-mu.vercel.app/).]
-- Ver Repositório: [(https://github.com/netoMendes21/Calculadora-IMC).]
+- Acessar o projeto: Calculadora IMC [(https://projeto-calculadora-imc-mu.vercel.app/)]
+- Ver Repositório: [(https://github.com/netoMendes21/Calculadora-IMC)]
 
 ## Objetivo
 
